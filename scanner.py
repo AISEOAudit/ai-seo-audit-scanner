@@ -1,6 +1,10 @@
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+
+app = FastAPI()
 
 def check_robots_txt(base_url):
     try:
@@ -33,12 +37,10 @@ def check_schema(base_url):
     except Exception:
         return "⚠️ Could not check schema markup"
 
-def run_scan(base_url):
-    print("🔍 Scanning:", base_url)
-    print(check_robots_txt(base_url))
-    print(check_sitemap(base_url))
-    print(check_schema(base_url))
-
-if __name__ == "__main__":
-    site = input("Enter the full website URL (e.g., https://example.com): ")
-    run_scan(site)
+@app.get("/scan")
+def run_scan(url: str):
+    return {
+        "robots": check_robots_txt(url),
+        "sitemap": check_sitemap(url),
+        "schema": check_schema(url)
+    }
