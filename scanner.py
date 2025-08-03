@@ -1,9 +1,19 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
 app = FastAPI()
+
+# ✅ CORS configuration – allow your front-end to call this
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://aiseoaudit.io"],  # Your site
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def check_robots_txt(base_url):
     try:
@@ -41,7 +51,7 @@ def check_bot_blocking_headers(base_url):
     try:
         res = requests.get(base_url, timeout=5)
         headers = res.headers
-        if "cf-ray" in headers or "x-protection" in headers or "server" in headers and "cloudflare" in headers["server"].lower():
+        if "cf-ray" in headers or "x-protection" in headers or ("server" in headers and "cloudflare" in headers["server"].lower()):
             return "⚠️ Cloudflare or bot protection detected (GPTBot may be blocked)"
         return "✅ No obvious bot protection headers"
     except Exception:
