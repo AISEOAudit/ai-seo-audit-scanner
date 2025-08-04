@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+import json
 
 app = FastAPI()
 
@@ -15,6 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ✅ Core checks
 def check_robots_txt(base_url):
     try:
         robots_url = urljoin(base_url, "/robots.txt")
@@ -57,11 +59,49 @@ def check_bot_blocking_headers(base_url):
     except Exception:
         return "⚠️ Could not check bot protection headers"
 
+# ✅ New: Schema detection
+def extract_schemas(html):
+    soup = BeautifulSoup(html, "html.parser")
+    schema_data = []
+
+    for script in soup.find_all("script", type="application/ld+json"):
+        try:
+            json_data = json.loads(script.string)
+            if isinstance(json_data, list):
+                schema_data.extend(json_data)
+            else:
+                schema_data.append(json_data)
+        except (ValueError, TypeError):
+            continue
+
+    detected_types = set()
+    for schema in schema_data:
+        if "@type" in schema:
+            types = schema["@type"]
+            if isinstance(types, list):
+                detected_types.update(types)
+            else:
+                detected_types.add(types)
+
+    return list(detected_types)
+
+# ✅ Scan endpoint
 @app.get("/scan")
 def run_scan(url: str):
+    try:
+        html = requests.get(url, timeout=5).text
+    except Exception:
+        html = ""
+
+    schemas = extract_schemas(html)
+    expected = ["Organization", "WebSite", "FAQ", "HowTo", "Article"]
+    missing = [s for s in expected if s not in schemas]
+
     return {
         "robots_txt": check_robots_txt(url),
         "meta_noindex": check_meta_noindex(url),
         "meta_nofollow": check_meta_nofollow(url),
         "bot_protection": check_bot_blocking_headers(url),
+        "schemas": schemas,
+        "missing_schemas": missing,
     }
