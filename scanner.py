@@ -10,13 +10,13 @@ app = FastAPI()
 # ✅ CORS configuration – allow your front-end to call this
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://aiseoaudit.io"],  # Your site
+    allow_origins=["https://aiseoaudit.io"],  # Your live site domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ✅ Core checks
+# ✅ Core visibility checks
 def check_robots_txt(base_url):
     try:
         robots_url = urljoin(base_url, "/robots.txt")
@@ -59,7 +59,7 @@ def check_bot_blocking_headers(base_url):
     except Exception:
         return "⚠️ Could not check bot protection headers"
 
-# ✅ New: Schema detection
+# ✅ Schema detection
 def extract_schemas(html):
     soup = BeautifulSoup(html, "html.parser")
     schema_data = []
@@ -85,7 +85,7 @@ def extract_schemas(html):
 
     return list(detected_types)
 
-# ✅ Scan endpoint
+# ✅ Scanner endpoint
 @app.get("/scan")
 def run_scan(url: str):
     try:
@@ -94,7 +94,9 @@ def run_scan(url: str):
         html = ""
 
     schemas = extract_schemas(html)
-    expected = ["Organization", "WebSite", "FAQ", "HowTo", "Article"]
+
+    # ✅ Updated expected list — changed "FAQ" to "FAQPage"
+    expected = ["Organization", "WebSite", "FAQPage", "HowTo", "Article"]
     missing = [s for s in expected if s not in schemas]
 
     return {
