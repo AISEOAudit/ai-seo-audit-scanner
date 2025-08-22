@@ -600,7 +600,7 @@ const blockedLikely = Object.entries(report.checks.cloudflare.botAccess)
 .filter(([, v]) => v.blockedLikely)
 .map(([k]) => k);
 report.summary.push('Cloudflare detected.');
-if (blockedLikely.length) report.summary.push(Potential bot blocking: ${blockedLikely.join(', ')});
+if (blockedLikely.length) report.summary.push(`Potential bot blocking: ${blockedLikely.join(', ')}`);
 } else {
 report.summary.push('No Cloudflare signatures detected.');
 }
