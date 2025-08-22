@@ -102,7 +102,7 @@ u.hash = '';
 u.search = '';
 return u.origin;
 } catch {
-throw new Error(Invalid URL: ${url});
+throw new Error(`Invalid URL: ${url}`);
 }
 }
 
