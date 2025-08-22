@@ -269,7 +269,7 @@ return Array.from(urls);
 // HTML/Schema helpers
 function extractJsonLd(html) {
 const out = [];
-const scriptRegex = /<script[^>]+type=["']application/ld+json["'][^>]>([\s\S]?)</script>/gi;
+const scriptRegex = /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
 let m;
 while ((m = scriptRegex.exec(html)) !== null) {
 const raw = m[1].trim();
