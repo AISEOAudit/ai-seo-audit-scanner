@@ -593,7 +593,7 @@ const blockedBots = ['GPTBot', 'PerplexityBot', 'Googlebot', 'Google-Extended'].
 (b) => report.checks.robotsTxt.bots[b] && !report.checks.robotsTxt.bots[b].allowedAtRoot
 );
 if (blockedBots.length === 0) report.summary.push('Robots.txt allows all checked AI bots at root.');
-else report.summary.push(Robots.txt blocks: ${blockedBots.join(', ')} at root.);
+else report.summary.push(`Robots.txt blocks: ${blockedBots.join(', ')} at root.`);
 
 if (report.checks.cloudflare.usingCloudflare) {
 const blockedLikely = Object.entries(report.checks.cloudflare.botAccess)
