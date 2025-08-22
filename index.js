@@ -216,8 +216,8 @@ return new RegExp('^' + escaped);
 // Sitemap discovery and parsing
 function extractSitemapLocs(xml) {
 const locs = [];
-const sitemapIndex = /<sitemap[^>]>[\s\S]?<loc>([\s\S]?)</loc>[\s\S]?</sitemap>/gi;
-const urlset = /<url[^>]>[\s\S]?<loc>([\s\S]?)</loc>[\s\S]?</url>/gi;
+const sitemapIndex = /<sitemap[^>]*>[\s\S]*?<loc>([\s\S]*?)<\/loc>[\s\S]*?<\/sitemap>/gi;
+const urlset = /<url[^>]*>[\s\S]*?<loc>([\s\S]*?)<\/loc>[\s\S]*?<\/url>/gi;
 let m;
 while ((m = sitemapIndex.exec(xml)) !== null) locs.push(m[1].trim());
 if (locs.length === 0) {
