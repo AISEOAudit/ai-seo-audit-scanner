@@ -206,9 +206,12 @@ function parseRobots(robotsTxt) {
 
 function robotsPatternToRegex(pattern) {
   if (!pattern || pattern === '') return /^$/;
-  let escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
-  escaped = escaped.replace(/\\\*/g, '.*');
-  if (escaped.endsWith('\\$')) escaped = escaped.slice(0, -2) + '$';
+  // Escape regex metacharacters, then replace original robots.txt * with .*
+  let escaped = pattern.replace(/[-[\]{}()+?.,\\^$|#\s]/g, '\\$&');
+  escaped = escaped.replace(/\*/g, '.*');
+  if (escaped.endsWith('\\$')) {
+    escaped = escaped.slice(0, -2) + '$';
+  }
   return new RegExp('^' + escaped);
 }
 
